@@ -1,21 +1,29 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import toJSON from "../toJSON/toJSON";
 import paginate from "../paginate/paginate";
-import { ICoupon, CouponModel } from "./coupon.interfaces";
+import {
+  ICoupon,
+  CouponModel,
+  UserSegment,
+  CouponType,
+} from "./coupon.interfaces";
 
-const couponSchema = new mongoose.Schema<ICoupon>(
-  {
-    name: { type: String, required: true },
-    description: { type: String, required: true },
-    price: { type: Number, required: true },
-    category: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+const couponSchema: Schema = new Schema({
+  code: { type: String, unique: true },
+  type: { type: String, enum: Object.values(CouponType), required: true },
+  value: { type: Number, required: true },
+  minimum_purchase_amount: { type: Number },
+  maximum_discount_amount: { type: Number },
+  valid_from: { type: Date, required: true },
+  valid_until: { type: Date, required: true },
+  max_uses_per_user: { type: Number },
+  total_uses: { type: Number, default: 0 },
+  user_segment: {
+    type: String,
+    enum: Object.values(UserSegment),
+    required: true,
   },
-  {
-    timestamps: true,
-  }
-);
+});
 
 couponSchema.plugin(toJSON);
 couponSchema.plugin(paginate);
